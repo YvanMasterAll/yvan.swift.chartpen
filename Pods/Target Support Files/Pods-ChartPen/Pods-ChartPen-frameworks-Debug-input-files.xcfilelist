@@ -1,0 +1,3 @@
+${PODS_ROOT}/Target Support Files/Pods-ChartPen/Pods-ChartPen-frameworks.sh
+${BUILT_PRODUCTS_DIR}/BezierKit/BezierKit.framework
+${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework

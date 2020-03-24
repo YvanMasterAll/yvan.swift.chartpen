@@ -1,0 +1,6 @@
+framework module Pods_ChartPenUITests {
+  umbrella header "Pods-ChartPenUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
