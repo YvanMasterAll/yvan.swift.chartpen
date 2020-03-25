@@ -25,6 +25,8 @@
 		C68D02A72428B480000DE5AF /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C68D02A62428B480000DE5AF /* ToolBar.swift */; };
 		C68D02A92428B6B8000DE5AF /* ToolItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C68D02A82428B6B8000DE5AF /* ToolItem.swift */; };
 		C68D02AB2428C5AA000DE5AF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C68D02AA2428C5AA000DE5AF /* Constant.swift */; };
+		C6916014242AE87A0042A8E2 /* ZoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6916013242AE87A0042A8E2 /* ZoomView.swift */; };
+		C6916018242B1E630042A8E2 /* Draft.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6916017242B1E630042A8E2 /* Draft.swift */; };
 		C69B293F2429898200B12306 /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69B293E2429898200B12306 /* Tool.swift */; };
 		C69B294124298D6000B12306 /* PenTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69B294024298D6000B12306 /* PenTool.swift */; };
 		C69B294324298D8700B12306 /* SelectTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69B294224298D8700B12306 /* SelectTool.swift */; };
@@ -77,6 +79,8 @@
 		C68D02A62428B480000DE5AF /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
 		C68D02A82428B6B8000DE5AF /* ToolItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolItem.swift; sourceTree = "<group>"; };
 		C68D02AA2428C5AA000DE5AF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		C6916013242AE87A0042A8E2 /* ZoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomView.swift; sourceTree = "<group>"; };
+		C6916017242B1E630042A8E2 /* Draft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Draft.swift; sourceTree = "<group>"; };
 		C69B293E2429898200B12306 /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
 		C69B294024298D6000B12306 /* PenTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PenTool.swift; sourceTree = "<group>"; };
 		C69B294224298D8700B12306 /* SelectTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectTool.swift; sourceTree = "<group>"; };
@@ -191,6 +195,8 @@
 				C68D02A224289345000DE5AF /* Panel.swift */,
 				C68D02A62428B480000DE5AF /* ToolBar.swift */,
 				C68D02A82428B6B8000DE5AF /* ToolItem.swift */,
+				C6916013242AE87A0042A8E2 /* ZoomView.swift */,
+				C6916017242B1E630042A8E2 /* Draft.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -474,6 +480,8 @@
 				C68D02A92428B6B8000DE5AF /* ToolItem.swift in Sources */,
 				C68D02A72428B480000DE5AF /* ToolBar.swift in Sources */,
 				C68D02A52428A531000DE5AF /* Utils.swift in Sources */,
+				C6916018242B1E630042A8E2 /* Draft.swift in Sources */,
+				C6916014242AE87A0042A8E2 /* ZoomView.swift in Sources */,
 				C647075D24273C1A0085CE40 /* ViewController.swift in Sources */,
 				C68D02AB2428C5AA000DE5AF /* Constant.swift in Sources */,
 				C69B29472429BC7500B12306 /* Action.swift in Sources */,

@@ -19,6 +19,7 @@ class Panel: UIView {
     var anchorslist: [[CGPoint]] = []   // 路径锚点，可以成为锚点的点集
     var actions: [Action] = []          // 动作
     var isTouched: Bool = false
+    var isLandscape: Bool = false       // 横竖屏
     
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -31,10 +32,17 @@ class Panel: UIView {
         
         setupUI()
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
     //MARK: - 私有成员
     fileprivate var labl_coordinates = UILabel()    // 坐标文本
     fileprivate var currentTool: Tool!              // 当前工具
+    fileprivate var v_degree_lv = UIView()          // 垂直刻度线
+    fileprivate var v_degree_lh = UIView()          // 水平刻度线
+    fileprivate var density = 10                    // 刻度密度
 }
 
 //MARK: - 初始化
@@ -44,12 +52,21 @@ extension Panel {
         // 坐标文本
         self.addSubview(labl_coordinates)
         labl_coordinates.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        labl_coordinates.textColor = UIColor.black.withAlphaComponent(0.5)
-        labl_coordinates.snp.makeConstraints { make in
-            make.bottom.equalTo(self).offset(-8)
-            make.centerX.equalTo(self.snp.centerX)
-        }
+        labl_coordinates.textColor = UIColor.black.withAlphaComponent(0.2)
+        labl_coordinates.isHidden = true
+        // 刻度线
+        self.addSubview(self.v_degree_lh)
+        v_degree_lh.frame = .init(x: 0, y: 0, width: self.frame.width, height: 1)
+        v_degree_lh.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        v_degree_lh.isHidden = true
+        self.addSubview(self.v_degree_lv)
+        v_degree_lv.frame = .init(x: 0, y: 0, width: 1, height: self.frame.height)
+        v_degree_lv.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        v_degree_lv.isHidden = true
+        // 添加手势
         setupGesture()
+        // 添加横竖屏监听
+        NotificationCenter.default.addObserver(self, selector: #selector(handleOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     fileprivate func setupGesture() {
@@ -125,6 +142,60 @@ extension Panel {
             path.generateLookupTable()
             anchorslist.append(path.lookupTable)
         }
+        drawDegree(context: context)
+    }
+    
+    fileprivate func drawDegree(context: CGContext) {
+        // 绘制刻度
+        let dl: CGFloat = 10 // 刻度长度
+        let h1: CGFloat = isLandscape ? self.frame.width-CGFloat(toolbar_height):self.frame.height
+        let w1: CGFloat = isLandscape ? self.frame.height+CGFloat(toolbar_height):self.frame.width
+        var x1: CGFloat = 0
+        let y1: CGFloat = h1
+        context.beginPath()
+        while x1 < w1 {
+            x1 += CGFloat(density)
+            if Int(x1)%(5*density) == 0 {
+                context.setStrokeColor(UIColor.black.cgColor)
+                context.move(to: CGPoint(x: x1, y: y1))
+                context.addLine(to: CGPoint(x: x1, y: y1-dl))
+                let paragraphStyle = NSParagraphStyle()
+                let attrs: [NSAttributedString.Key : Any] = [
+                    .paragraphStyle: paragraphStyle,
+                    .font: UIFont.systemFont(ofSize: 12.0),
+                    .foregroundColor: UIColor.black.withAlphaComponent(0.5)
+                ]
+                let string = "\(Int(x1/5))"
+                string.draw(with: CGRect(x: x1-8, y: y1-dl-14, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+            } else {
+                context.setStrokeColor(UIColor.black.cgColor)
+                context.move(to: CGPoint(x: x1, y: y1))
+                context.addLine(to: CGPoint(x: x1, y: y1-dl/2))
+            }
+        }
+        let x2: CGFloat = 0
+        var y2: CGFloat = h1
+        while y2 > 0 {
+            y2 -= CGFloat(density)
+            if Int(h1 - y2)%(5*density) == 0 {
+                context.setStrokeColor(UIColor.black.cgColor)
+                context.move(to: CGPoint(x: x2, y: y2))
+                context.addLine(to: CGPoint(x: x2+dl, y: y2))
+                let paragraphStyle = NSParagraphStyle()
+                let attrs: [NSAttributedString.Key : Any] = [
+                    .paragraphStyle: paragraphStyle,
+                    .font: UIFont.systemFont(ofSize: 12.0),
+                    .foregroundColor: UIColor.black.withAlphaComponent(0.5)
+                ]
+                let string = "\(Int(h1 - y2)/5)"
+                string.draw(with: CGRect(x: x2+dl+4, y: y2-8, width: 40, height: 20), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
+            } else {
+                context.setStrokeColor(UIColor.black.cgColor)
+                context.move(to: CGPoint(x: x2, y: y2))
+                context.addLine(to: CGPoint(x: x2+dl/2, y: y2))
+            }
+        }
+        context.strokePath()
     }
 }
 
@@ -187,8 +258,15 @@ extension Panel {
     // 拖动手势
     @objc func didPan(pan: UIPanGestureRecognizer) {
         let point = pan.location(in: self)
-        // 更新坐标
-        self.updateCoordinate(point)
+        switch pan.state {
+        case .began, .changed:
+            // 更新坐标
+            self.showDegreeLine(point)
+        case .cancelled, .ended, .failed:
+            self.hideDegreeLine()
+        default:
+            break
+        }
         currentTool.handle(event: .pan(ges: pan))
     }
     
@@ -212,11 +290,37 @@ extension Panel {
     }
 }
 
-//MARK: - 时间处理
+//MARK: - 事件处理
 extension Panel {
     
-    fileprivate func updateCoordinate(_ point: CGPoint) {
-        self.labl_coordinates.text = "\(point.x)，\(point.y)"
+    fileprivate func showDegreeLine(_ point: CGPoint) {
+        self.labl_coordinates.isHidden = false
+        self.v_degree_lh.isHidden = false
+        self.v_degree_lv.isHidden = false
+        v_degree_lh.frame.origin.y = point.y
+        v_degree_lh.frame.size.width = self.frame.width
+        v_degree_lv.frame.origin.x = point.x
+        v_degree_lv.frame.size.height = self.frame.height
+        self.labl_coordinates.text = "\(Int(point.x/5))，\(Int((self.frame.height-point.y)/5))"
+        self.labl_coordinates.frame.origin = point
+        self.labl_coordinates.sizeToFit()
+    }
+    
+    fileprivate func hideDegreeLine() {
+        self.labl_coordinates.isHidden = true
+        self.v_degree_lh.isHidden = true
+        self.v_degree_lv.isHidden = true
+    }
+    
+    @objc private func handleOrientationChange(notification: Notification) {
+        // 获取设备方向
+        let statusBarOrientation = UIApplication.shared.statusBarOrientation
+        if statusBarOrientation.isPortrait {
+            isLandscape = false
+        } else if statusBarOrientation.isLandscape {
+            isLandscape = true
+        }
+        self.setNeedsDisplay()
     }
 }
 
@@ -234,11 +338,18 @@ extension Panel: ToolBarDelegate {
             break
         case .undo: // 撤销
             toolItem.tool.handle(event: .undo)
+        case .select:
+            if currentTool != nil { // 更新工具
+                self.currentTool.reset()
+            }
+            self.currentTool = toolItem.tool
+            self.isUserInteractionEnabled = false
         default:
             if currentTool != nil { // 更新工具
                 self.currentTool.reset()
             }
             self.currentTool = toolItem.tool
+            self.isUserInteractionEnabled = true
         }
     }
 }

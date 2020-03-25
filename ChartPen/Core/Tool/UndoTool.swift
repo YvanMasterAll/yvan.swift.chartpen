@@ -24,7 +24,7 @@ class UndoTool: Tool {
             break
         }
     }
-   
+    
     //MARK: - 私有成员
     fileprivate var p: Panel!
 }
